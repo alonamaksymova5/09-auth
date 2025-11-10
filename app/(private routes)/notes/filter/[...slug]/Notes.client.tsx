@@ -13,7 +13,7 @@ import { fetchNotes } from "@/lib/api";
 import css from "./NotesClient.module.css";
 import Link from "next/link";
 
-const PER_PAGE = 9;
+const PER_PAGE = 12;
 
 interface NotesClientProps {
   tag: string;
