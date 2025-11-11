@@ -1,13 +1,11 @@
 import axios from "axios";
-import type { NewNote, Note } from "../types/note";
-import { ALL_NOTES } from "./constants";
+import { ALL_NOTES } from "../constants";
+import type { Note } from "../../types/note";
 
 interface NotesResponse {
   notes: Note[];
   totalPages: number;
 }
-
-axios.defaults.baseURL = "https://notehub-public.goit.study/api";
 
 export async function fetchNotes(
   page: number,
@@ -36,24 +34,6 @@ export async function fetchNotes(
   return res.data;
 }
 
-export async function createNote(newNote: NewNote): Promise<Note> {
-  const res = await axios.post("/notes", newNote, {
-    headers: {
-      Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
-    },
-  });
-  return res.data;
-}
-
-export async function deleteNote(noteId: string): Promise<Note> {
-  const res = await axios.delete<Note>(`/notes/${noteId}`, {
-    headers: {
-      Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
-    },
-  });
-  return res.data;
-}
-
 export async function fetchNoteById(noteId: string): Promise<Note> {
   const res = await axios.get<Note>(`/notes/${noteId}`, {
     headers: {
@@ -62,3 +42,6 @@ export async function fetchNoteById(noteId: string): Promise<Note> {
   });
   return res.data;
 }
+
+//getMe
+//checkSession - до params потрібно додавати cookies у headers

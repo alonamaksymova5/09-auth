@@ -26,5 +26,3 @@ export const useNoteStore = create<NoteDraft>()(
     { name: "draft", partialize: (state) => ({ draft: state.draft }) }
   )
 );
-
-console.log(useNoteStore.getState().draft);
