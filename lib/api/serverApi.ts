@@ -1,6 +1,9 @@
 import axios from "axios";
+import { cookies } from "next/headers";
+import { api } from "./api";
 import { ALL_NOTES } from "../constants";
 import type { Note } from "../../types/note";
+import type { User } from "@/types/user";
 
 interface NotesResponse {
   notes: Note[];
@@ -34,6 +37,8 @@ export async function fetchNotes(
   return res.data;
 }
 
+//функція отримання однієї нотатки
+
 export async function fetchNoteById(noteId: string): Promise<Note> {
   const res = await axios.get<Note>(`/notes/${noteId}`, {
     headers: {
@@ -43,5 +48,30 @@ export async function fetchNoteById(noteId: string): Promise<Note> {
   return res.data;
 }
 
-//getMe
-//checkSession - до params потрібно додавати cookies у headers
+//функція отримання свого профілю
+
+export const getMe = async () => {
+  const { data } = await api.get<User>("/users/me");
+  return data;
+};
+
+//функція перевірки активної сесії
+
+type CheckSessionRequest = {
+  success: boolean;
+};
+
+export const checkSession = async () => {
+  const res = await api.get<CheckSessionRequest>("/auth/session");
+  return res.data.success;
+}; //promise?
+
+export const checkServerSession = async () => {
+  const cookieStore = await cookies();
+  const res = await api.get("/auth/session", {
+    headers: {
+      Cookie: cookieStore.toString(),
+    },
+  });
+  return res;
+}; //promise?

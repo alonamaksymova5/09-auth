@@ -1,16 +1,23 @@
+"use client";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useUserStore } from "@/lib/store/authStore";
+import { useAuthStore } from "@/lib/store/authStore";
+import { logout } from "@/lib/api/clientApi";
 import css from "./AuthNavigation.module.css";
 
 export default function AuthNavigation() {
   const router = useRouter();
-  const { isAuthenticated, clearIsAuthenticated } = useUserStore(); //ДУЖКИ!!!!
+  const { isAuthenticated, user } = useAuthStore();
+  const clearIsAuthenticated = useAuthStore(
+    (state) => state.clearIsAuthenticated
+  );
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logout();
     clearIsAuthenticated();
-    router.push("/login");
-  }; //ЧИ ЦЕ ТА ФУНКЦІЯ???
+    router.push("/sign-in");
+  };
 
   return (
     <>
@@ -49,7 +56,7 @@ export default function AuthNavigation() {
             </Link>
           </li>
           <li className={css.navigationItem}>
-            <p className={css.userEmail}>User email</p>
+            <p className={css.userEmail}>{user?.email}</p>
             <button className={css.logoutButton} onClick={handleLogout}>
               Logout
             </button>

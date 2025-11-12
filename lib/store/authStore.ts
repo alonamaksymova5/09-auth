@@ -2,12 +2,12 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { User } from "@/types/user";
 
-interface AuthStore {
-  user: User;
+type AuthStore = {
+  user: User | null;
   isAuthenticated: boolean;
-  setUser: (newUser: User) => void;
+  setUser: (user: User) => void;
   clearIsAuthenticated: () => void;
-}
+};
 
 const initialUser: User = {
   email: "",
@@ -15,14 +15,13 @@ const initialUser: User = {
   avatar: "",
 };
 
-export const useUserStore = create<AuthStore>()(
+export const useAuthStore = create<AuthStore>()(
   persist(
     (set) => {
       return {
         user: initialUser,
         isAuthenticated: false,
-        setUser: (newUser: User) =>
-          set({ user: newUser, isAuthenticated: true }),
+        setUser: (user: User) => set({ user: user, isAuthenticated: true }),
         clearIsAuthenticated: () =>
           set({ user: initialUser, isAuthenticated: false }),
       };

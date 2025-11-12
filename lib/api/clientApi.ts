@@ -87,7 +87,29 @@ export const login = async (data: LoginRequest): Promise<User> => {
   return res.data;
 };
 
-//logout;
-//checkSession;
-//getMe;
-//updateMe;
+export const logout = async (): Promise<void> => {
+  await api.post("/auth/logout");
+};
+
+//функція перевірки активної сесії
+
+type CheckSessionRequest = {
+  success: boolean;
+};
+
+export const checkSession = async () => {
+  const res = await api.get<CheckSessionRequest>("/auth/session");
+  return res.data.success;
+}; //promise?
+
+//функція отримання свого профілю
+
+export const getMe = async () => {
+  const { data } = await api.get<User>("/users/me");
+  return data;
+};
+
+export const updateMe = async () => {
+  const { data } = await api.get<User>("/users/me");
+  return data;
+};
