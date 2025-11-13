@@ -1,5 +1,5 @@
-import axios from "axios";
 import { cookies } from "next/headers";
+import type { AxiosResponse } from "axios";
 import { api } from "./api";
 import { ALL_NOTES } from "../constants";
 import type { Note } from "../../types/note";
@@ -26,52 +26,40 @@ export async function fetchNotes(
     params.tag = tag;
   }
 
-  const res = await axios.get<NotesResponse>("/notes", {
+  const res = await api.get<NotesResponse>("/notes", {
     params,
-    headers: {
-      Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
-    },
   });
   console.log("Response data for", tag, res.data);
 
   return res.data;
 }
 
-//функція отримання однієї нотатки
-
 export async function fetchNoteById(noteId: string): Promise<Note> {
-  const res = await axios.get<Note>(`/notes/${noteId}`, {
-    headers: {
-      Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
-    },
-  });
+  const res = await api.get<Note>(`/notes/${noteId}`);
   return res.data;
 }
-
-//функція отримання свого профілю
 
 export const getMe = async () => {
   const { data } = await api.get<User>("/users/me");
   return data;
 };
 
-//функція перевірки активної сесії
-
-type CheckSessionRequest = {
-  success: boolean;
-};
-
-export const checkSession = async () => {
-  const res = await api.get<CheckSessionRequest>("/auth/session");
-  return res.data.success;
-}; //promise?
-
-export const checkServerSession = async () => {
+export const checkServerSession = async (): Promise<AxiosResponse<User>> => {
   const cookieStore = await cookies();
-  const res = await api.get("/auth/session", {
+  const res = await api.get<User>("/auth/session", {
     headers: {
       Cookie: cookieStore.toString(),
     },
   });
   return res;
-}; //promise?
+};
+
+export const getServerMe = async (): Promise<User> => {
+  const cookieStore = await cookies();
+  const { data } = await api.get("/users/me", {
+    headers: {
+      Cookie: cookieStore.toString(),
+    },
+  });
+  return data;
+};

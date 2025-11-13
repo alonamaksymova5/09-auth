@@ -2,14 +2,21 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/lib/store/authStore";
 import { updateMe } from "@/lib/api/clientApi";
 import css from "./EditProfilePage.module.css";
 
 export default function EditProfilePage() {
-    const router = useRouter();
-    
-  const handleEdit = async () => {
-    await updateMe();
+  const router = useRouter();
+  const { user } = useAuthStore();
+
+  const handleEdit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const username = formData.get("username") as string;
+
+    await updateMe({ username });
     router.push("/profile");
   };
 
@@ -26,28 +33,28 @@ export default function EditProfilePage() {
           className={css.avatar}
         />
 
-        <form className={css.profileInfo}>
+        <form className={css.profileInfo} onSubmit={handleEdit}>
           <div className={css.usernameWrapper}>
             <label htmlFor="username">Username:</label>
             <input
               id="username"
               type="text"
               className={css.input}
-              placeholder="name???"
+              defaultValue={user?.username || ""}
             />
           </div>
 
-          <p>Email: user_email@example.com</p>
+          <p>Email: {user?.email}</p>
 
           <div className={css.actions}>
-            <button
-              type="submit"
-              className={css.saveButton}
-              onClick={handleEdit}
-            >
+            <button type="submit" className={css.saveButton}>
               Save
             </button>
-            <button type="button" className={css.cancelButton}>
+            <button
+              type="button"
+              className={css.cancelButton}
+              onClick={() => router.push("/profile")}
+            >
               Cancel
             </button>
           </div>

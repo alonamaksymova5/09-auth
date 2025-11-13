@@ -1,5 +1,3 @@
-//сторінка автентифікації користувача
-
 "use client";
 
 import { useState } from "react";

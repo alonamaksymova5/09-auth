@@ -1,5 +1,3 @@
-// сторінка реєстрації користувача
-
 "use client";
 
 import { useState } from "react";
@@ -23,6 +21,7 @@ export default function SignUpPage() {
     try {
       await register(data);
       setError("");
+      // console.log("registered successfully");
       router.push("/profile");
     } catch (err: unknown) {
       const errorMessage =
