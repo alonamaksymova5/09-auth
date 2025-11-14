@@ -30,13 +30,17 @@ export default async function ProfilePage() {
         </div>
 
         <div className={css.avatarWrapper}>
-          <Image
-            src={user.avatar}
-            alt="User Avatar"
-            width={120}
-            height={120}
-            className={css.avatar}
-          />
+          {user?.avatar ? (
+            <Image
+              src={user.avatar}
+              alt="User Avatar"
+              width={120}
+              height={120}
+              priority
+            />
+          ) : (
+            <div className={css.placeholderAvatar}></div>
+          )}
         </div>
 
         <div className={css.profileInfo}>

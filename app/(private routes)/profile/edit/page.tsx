@@ -25,13 +25,17 @@ export default function EditProfilePage() {
       <div className={css.profileCard}>
         <h1 className={css.formTitle}>Edit Profile</h1>
 
-        <Image
-          src="avatar"
-          alt="User Avatar"
-          width={120}
-          height={120}
-          className={css.avatar}
-        />
+        {user?.avatar ? (
+          <Image
+            src={user.avatar}
+            alt="User Avatar"
+            width={120}
+            height={120}
+            priority
+          />
+        ) : (
+          <div className={css.placeholderAvatar}></div>
+        )}
 
         <form className={css.profileInfo} onSubmit={handleEdit}>
           <div className={css.usernameWrapper}>

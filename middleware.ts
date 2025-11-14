@@ -3,11 +3,12 @@ import { cookies } from "next/headers";
 import { parse } from "cookie";
 import { checkServerSession } from "./lib/api/serverApi";
 
-const privateRoutes = ["/profile"];
+const privateRoutes = ["/profile", "/notes"];
 const publicRoutes = ["/sign-in", "/sign-up"];
 
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
   const refreshToken = cookieStore.get("refreshToken")?.value;
@@ -19,13 +20,30 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith(route)
   );
 
-  if (!accessToken) {
-    if (refreshToken) {
-      const data = await checkServerSession();
-      const setCookie = data.headers["set-cookie"];
+  if (accessToken) {
+    if (isPublicRoute) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+    return NextResponse.next();
+  }
+
+  if (refreshToken) {
+    const session = await checkServerSession();
+
+    if (!session) {
+      cookieStore.delete("refreshToken");
+
+      if (isPublicRoute) return NextResponse.next();
+      if (isPrivateRoute)
+        return NextResponse.redirect(new URL("/sign-in", req.url));
+    }
+
+    if (session) {
+      const setCookie = session.headers["set-cookie"];
 
       if (setCookie) {
         const cookieArray = Array.isArray(setCookie) ? setCookie : [setCookie];
+
         for (const cookieStr of cookieArray) {
           const parsed = parse(cookieStr);
           const options = {
@@ -33,45 +51,22 @@ export async function middleware(request: NextRequest) {
             path: parsed.Path,
             maxAge: Number(parsed["Max-Age"]),
           };
+
           if (parsed.accessToken)
             cookieStore.set("accessToken", parsed.accessToken, options);
           if (parsed.refreshToken)
             cookieStore.set("refreshToken", parsed.refreshToken, options);
         }
-        if (isPublicRoute) {
-          return NextResponse.redirect(new URL("/", request.url), {
-            headers: {
-              Cookie: cookieStore.toString(),
-            },
-          });
-        }
-
-        if (isPrivateRoute) {
-          return NextResponse.next({
-            headers: {
-              Cookie: cookieStore.toString(),
-            },
-          });
-        }
       }
     }
 
-    if (isPublicRoute) {
-      return NextResponse.next();
-    }
-
-    if (isPrivateRoute) {
-      return NextResponse.redirect(new URL("/sign-in", request.url));
-    }
-  }
-
-  if (isPublicRoute) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
-
-  if (isPrivateRoute) {
+    if (isPublicRoute) return NextResponse.redirect(new URL("/", req.url));
     return NextResponse.next();
   }
+
+  if (isPublicRoute) return NextResponse.next();
+  if (isPrivateRoute)
+    return NextResponse.redirect(new URL("/sign-in", req.url));
 }
 
 export const config = {

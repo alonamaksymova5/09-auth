@@ -27,7 +27,6 @@ export async function fetchNotes(
   const res = await api.get<NotesResponse>("/notes", {
     params,
   });
-  console.log("Response data for", tag, res.data);
 
   return res.data;
 }
@@ -46,8 +45,6 @@ export async function deleteNote(noteId: string): Promise<Note> {
   const res = await api.delete<Note>(`/notes/${noteId}`);
   return res.data;
 }
-
-//функція для запиту на реєстрацію нового користувача
 
 export type RegisterRequest = {
   email: string;
@@ -74,8 +71,12 @@ export const logout = async (): Promise<void> => {
 };
 
 export const checkSession = async (): Promise<User | null> => {
-  const res = await api.get<User>("/auth/session");
-  return res.data || null;
+  try {
+    const res = await api.get<User>("/auth/session");
+    return res.data || null;
+  } catch {
+    return null;
+  }
 };
 
 export const getMe = async () => {
@@ -84,10 +85,14 @@ export const getMe = async () => {
 };
 
 export const updateMe = async (data: {
-  email?: string;
   username?: string;
   avatar?: string;
 }): Promise<User> => {
-  const res = await api.patch<User>("/users/me", data);
+  const payload: Partial<{ username: string; avatar: string }> = {};
+
+  if (data.username) payload.username = data.username;
+  if (data.avatar) payload.avatar = data.avatar;
+
+  const res = await api.patch<User>("/users/me", payload);
   return res.data;
 };

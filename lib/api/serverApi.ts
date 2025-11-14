@@ -29,7 +29,6 @@ export async function fetchNotes(
   const res = await api.get<NotesResponse>("/notes", {
     params,
   });
-  console.log("Response data for", tag, res.data);
 
   return res.data;
 }
@@ -39,24 +38,23 @@ export async function fetchNoteById(noteId: string): Promise<Note> {
   return res.data;
 }
 
-export const getMe = async () => {
-  const { data } = await api.get<User>("/users/me");
-  return data;
-};
-
-export const checkServerSession = async (): Promise<AxiosResponse<User>> => {
-  const cookieStore = await cookies();
-  const res = await api.get<User>("/auth/session", {
-    headers: {
-      Cookie: cookieStore.toString(),
-    },
-  });
-  return res;
+export const checkServerSession = async () => {
+  try {
+    const cookieStore = await cookies();
+    const res = await api.get("/auth/session", {
+      headers: {
+        Cookie: cookieStore.toString(),
+      },
+    });
+    return res.data;
+  } catch {
+    return null;
+  }
 };
 
 export const getServerMe = async (): Promise<User> => {
   const cookieStore = await cookies();
-  const { data } = await api.get("/users/me", {
+  const { data } = await api.get<User>("/users/me", {
     headers: {
       Cookie: cookieStore.toString(),
     },
