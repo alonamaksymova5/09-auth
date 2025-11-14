@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { login, LoginRequest } from "@/lib/api/clientApi";
+import { login } from "@/lib/api/clientApi";
 import css from "./SignInPage.module.css";
 
 export default function SignInPage() {
@@ -13,26 +13,17 @@ export default function SignInPage() {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
-    const data: LoginRequest = {
+    const data = {
       email: formData.get("email") as string,
       password: formData.get("password") as string,
     };
 
     try {
       await login(data);
+      setTimeout(() => router.push("/profile"), 100);
       setError("");
-      router.push("/profile");
-    } catch (err: unknown) {
-      const errorMessage =
-        (
-          err as {
-            response?: { data?: { message?: string } };
-            message?: string;
-          }
-        )?.response?.data?.message ||
-        (err as { message?: string })?.message ||
-        "Oops... something went wrong";
-      setError(errorMessage);
+    } catch {
+      setError("Oops... щось пішло не так");
     }
   };
 
