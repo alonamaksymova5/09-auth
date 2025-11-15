@@ -1,5 +1,4 @@
 import { cookies } from "next/headers";
-import type { AxiosResponse } from "axios";
 import { api } from "./api";
 import { ALL_NOTES } from "../constants";
 import type { Note } from "../../types/note";
