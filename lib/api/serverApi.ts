@@ -40,13 +40,18 @@ export async function fetchNoteById(noteId: string): Promise<Note> {
 
 export const checkServerSession = async () => {
   try {
-    const cookieStore = await cookies();
-    const res = await api.get("/auth/session", {
-      headers: {
-        Cookie: cookieStore.toString(),
-      },
-    });
-    return res.data;
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/session`,
+      {
+        method: "GET",
+        credentials: "include",
+      }
+    );
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    return data.success ? true : null;
   } catch {
     return null;
   }

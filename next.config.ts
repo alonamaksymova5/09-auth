@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   images: {
     remotePatterns: [
       {
@@ -9,6 +8,14 @@ const nextConfig: NextConfig = {
         hostname: "ac.goit.global",
       },
     ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: "https://notehub-api.goit.study/:path*",
+      },
+    ];
   },
 };
 
