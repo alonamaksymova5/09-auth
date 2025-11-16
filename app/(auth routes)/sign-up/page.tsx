@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/lib/store/authStore";
 import { register, RegisterRequest } from "@/lib/api/clientApi";
 import css from "./SignUpPage.module.css";
 
@@ -17,8 +18,9 @@ export default function SignUpPage() {
       password: formData.get("password") as string,
     };
     try {
-      await register(data);
+      const user = await register(data);
       setError("");
+      useAuthStore.getState().setUser(user);
       router.push("/profile");
     } catch (err: unknown) {
       const errorMessage =

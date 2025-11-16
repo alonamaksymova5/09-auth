@@ -18,8 +18,21 @@ export async function middleware(req: NextRequest) {
   }
 
   if (refreshToken) {
-    const sessionRestored = await checkServerSession();
-    if (sessionRestored) return NextResponse.next();
+    const sessionResponse = await checkServerSession();
+
+    if (sessionResponse) {
+      const res = NextResponse.next();
+
+      const setCookieHeader = sessionResponse.headers["set-cookie"];
+      if (setCookieHeader) {
+        setCookieHeader.forEach((cookie) => {
+          res.headers.append("set-cookie", cookie);
+        });
+      }
+
+      return res;
+    }
+
     const res = NextResponse.redirect(new URL("/sign-in", req.url));
     res.cookies.delete("refreshToken");
     return res;

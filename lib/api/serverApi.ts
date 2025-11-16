@@ -28,29 +28,24 @@ export async function fetchNotes(
   const res = await api.get<NotesResponse>("/notes", {
     params,
   });
-
   return res.data;
 }
 
-export async function fetchNoteById(noteId: string): Promise<Note> {
-  const res = await api.get<Note>(`/notes/${noteId}`);
-  return res.data;
-}
+export const fetchNoteById = async (noteId: string): Promise<Note> => {
+  const cookieStore = cookies();
+  const { data } = await api.get<Note>(`/notes/${noteId}`, {
+    headers: { Cookie: cookieStore.toString() },
+  });
+  return data;
+};
 
 export const checkServerSession = async () => {
+  const cookieStore = cookies();
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/session`,
-      {
-        method: "GET",
-        credentials: "include",
-      }
-    );
-
-    if (!res.ok) return null;
-
-    const data = await res.json();
-    return data.success ? true : null;
+    const res = await api.get("/auth/session", {
+      headers: { Cookie: cookieStore.toString() },
+    });
+    return res;
   } catch {
     return null;
   }

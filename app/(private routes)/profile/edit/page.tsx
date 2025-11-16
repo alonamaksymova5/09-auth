@@ -16,7 +16,8 @@ export default function EditProfilePage() {
     const formData = new FormData(e.currentTarget);
     const username = formData.get("username") as string;
 
-    await updateMe({ username });
+    const updatedUser = await updateMe({ username });
+    useAuthStore.getState().setUser(updatedUser);
     router.push("/profile");
   };
 
@@ -39,7 +40,7 @@ export default function EditProfilePage() {
 
         <form className={css.profileInfo} onSubmit={handleEdit}>
           <div className={css.usernameWrapper}>
-            <label htmlFor="username">Username:</label>
+            <label htmlFor="username">Username:{user?.username}</label>
             <input
               id="username"
               type="text"
